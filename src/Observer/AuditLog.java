@@ -1,3 +1,7 @@
+//Sebastian Rodriguez
+// Logs reservation events for auditing purposes
+
+
 package Observer;
 
 import model.Reservation;

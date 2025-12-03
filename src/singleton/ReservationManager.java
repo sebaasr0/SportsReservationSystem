@@ -1,3 +1,6 @@
+//Sebastian Rodriguez
+//Single instance that manages all reservations in the system
+
 package singleton;
 
 import model.*;

@@ -1,3 +1,7 @@
+//Sebastian Rodriguez
+//Updates the admin dashboard when reservation events occur.
+
+
 package Observer;
 
 import model.Reservation;

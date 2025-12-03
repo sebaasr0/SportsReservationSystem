@@ -1,3 +1,7 @@
+//Sebastian Rodriguez
+//Defines the specific variants of each sport field, each with its own display name and hourly price.
+//Every sport has exactly 2 subtypes.
+
 package model;
 
 public enum FieldSubtype {

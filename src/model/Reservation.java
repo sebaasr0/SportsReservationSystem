@@ -1,3 +1,6 @@
+//Sebastian Rodriguez
+//The main object that ties everything together. Represents a complete booking with user, field, time, cost, and status.
+
 package model;
 
 import java.util.UUID;

@@ -1,12 +1,16 @@
+//Sebastian Rodriguez
+//Concrete implementations of Field interface. Represents a soccer field with a specific subtype
+
 package model;
 
 public class SoccerField implements Field {
     private final FieldSubtype subtype;
-    
+
+    // Default constructor sets a default subtype
     public SoccerField() {
         this.subtype = FieldSubtype.SOCCER_5V5; // default
     }
-    
+
     public SoccerField(FieldSubtype subtype) {
         if (subtype.getSportType() != SportType.SOCCER) {
             throw new IllegalArgumentException("Invalid subtype for Soccer field");

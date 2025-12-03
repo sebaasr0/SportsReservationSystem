@@ -10,7 +10,7 @@ It demonstrates multiple design patterns in a real-world application including:
 - Decorator
 - Chain of Responsibility
 
-The system allows users to create reservations, apply add-ons, receive notifications, and log operations automatically.  :contentReference[oaicite:0]{index=0}
+The system allows users to create reservations, apply add-ons, receive notifications, and log operations automatically. 
 
 ---
 
@@ -27,7 +27,7 @@ Users can:
 - Receive confirmation messages
 - View reservation logs
 
-The entire workflow is structured using design patterns for modularity, maintainability, and extensibility.  :contentReference[oaicite:1]{index=1}
+The entire workflow is structured using design patterns for modularity, maintainability, and extensibility.
 
 ---
 
@@ -48,7 +48,7 @@ Used for:
 
 Why:
 - Prevents data inconsistency
-- Guarantees a single source of truth  :contentReference[oaicite:2]{index=2}
+- Guarantees a single source of truth
 
 ---
 
@@ -66,7 +66,7 @@ Creates sport field objects dynamically based on user choice.
 Why:
 - Centralizes creation logic
 - UI does not depend on concrete classes
-- Easy to add new field types  :contentReference[oaicite:3]{index=3}
+- Easy to add new field types
 
 ---
 
@@ -89,7 +89,7 @@ How it works:
 
 Why:
 - Loose coupling
-- Easy to add new notification channels  :contentReference[oaicite:4]{index=4}
+- Easy to add new notification channels
 
 ---
 
@@ -111,7 +111,7 @@ How it works:
 
 Why:
 - Actions as objects
-- Enables logging, queueing, and future undo/redo  :contentReference[oaicite:5]{index=5}
+- Enables logging, queueing, and future undo/redo
 
 ---
 
@@ -139,7 +139,7 @@ cost = new RefreshmentDecorator(cost);
 Why:
 - Stack features in any order
 - No subclass explosion
-- Easy extension  :contentReference[oaicite:6]{index=6}
+- Easy extension 
 
 ---
 
@@ -170,7 +170,7 @@ ValidationResult result = chain.handle(input);
 Why:
 - One responsibility per handler
 - Stops at first failure
-- Reorder/add rules easily  :contentReference[oaicite:7]{index=7}
+- Reorder/add rules easily
 
 ---
 
@@ -184,7 +184,7 @@ Why:
 ✔ Admin dashboard  
 ✔ Add-on pricing logic  
 ✔ Clean architecture  
-✔ Extendable design  :contentReference[oaicite:8]{index=8}
+✔ Extendable design
 
 ---
 
@@ -199,17 +199,17 @@ src/App/Main.java
 
 3. The GUI will appear.
 4. Select a field and complete reservation details.
-5. Confirm booking to see notifications and logs.  :contentReference[oaicite:9]{index=9}
+5. Confirm booking to see notifications and logs.
 
 ---
 
 ## Example Console Output
 
 ```
-[EMAIL] Sending email to: user@email.com
-[DASHBOARD] Reservation CREATED
-[AUDIT] Logging: CREATED
-[CMD] Reservation executed
+[EMAIL] Event=CREATED To=a@gmail.com -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
+[DASH]  CREATED -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
+[AUDIT] CREATED -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
+[CMD] Reserved -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
 ```
 
 ---
@@ -287,14 +287,14 @@ SportsReservationSystem/
 - Java
 - Java Swing
 - IntelliJ IDEA
-- Object-Oriented Design Patterns  :contentReference[oaicite:10]{index=10}
+- Object-Oriented Design Patterns 
 
 ---
 
 ## Sources Used
 
 - Course lecture slides and class materials (CIS3303 – Object-Oriented Design)
-- Project guide PDF: *Sports Field Reservation System – Complete Guide* \
+- Github copilot \
 
 ---
 

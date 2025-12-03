@@ -1,3 +1,6 @@
+//Sebastian Rodriguez
+//Represents a booking time period. The overlaps() method checks for scheduling conflicts.
+
 package model;
 
 import java.time.LocalDate;

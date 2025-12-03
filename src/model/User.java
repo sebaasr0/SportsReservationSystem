@@ -1,3 +1,6 @@
+//Sebastian Rodriguez
+//Stores customer contact information.
+
 package model;
 
 import java.util.Objects;

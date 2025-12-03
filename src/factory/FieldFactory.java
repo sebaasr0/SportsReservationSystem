@@ -1,3 +1,6 @@
+//Sebastian Rodriguez
+//Creates field objects without exposing creation logic to the client
+
 package factory;
 
 import model.*;

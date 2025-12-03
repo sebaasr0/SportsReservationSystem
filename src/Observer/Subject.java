@@ -1,3 +1,7 @@
+//Sebastian Rodriguez
+//Defines the contract for objects that maintain a list of observers and notify them of state changes.
+
+
 package Observer;
 
 import model.Reservation;

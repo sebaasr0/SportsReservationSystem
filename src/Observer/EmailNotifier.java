@@ -1,3 +1,7 @@
+//Sebastian Rodriguez
+//Sends email notifications when reservation events occur
+
+
 package Observer;
 
 import model.Reservation;
