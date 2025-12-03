@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public final class Timeslot {
+    // Date of reservation
     private final LocalDate date;
     private final LocalTime start;
     private final LocalTime end;
@@ -13,8 +14,11 @@ public final class Timeslot {
             throw new IllegalArgumentException("Invalid timeslot");
         this.date = date; this.start = start; this.end = end;
     }
+    // Returns date of reservation
     public LocalDate getDate() { return date; }
+    // Returns start time
     public LocalTime getStart() { return start; }
+    // Returns end time
     public LocalTime getEnd() { return end; }
 
     public boolean overlaps(Timeslot other) {

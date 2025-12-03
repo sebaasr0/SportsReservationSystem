@@ -10,7 +10,7 @@ It demonstrates multiple design patterns in a real-world application including:
 - Decorator
 - Chain of Responsibility
 
-The system allows users to create reservations, apply add-ons, receive notifications, and log operations automatically.
+The system allows users to create reservations, apply add-ons, receive notifications, and log operations automatically.  :contentReference[oaicite:0]{index=0}
 
 ---
 
@@ -18,15 +18,16 @@ The system allows users to create reservations, apply add-ons, receive notificat
 
 Users can:
 
-- Choose a sport and field type
-- Select date and time
+- Choose a sport and field type (Soccer, Tennis, Padel)
+- Select a field subtype (e.g., 5v5, Singles, With Roof, etc.)
+- Pick date and time
 - Enter contact information
 - Add optional services
 - Confirm bookings
 - Receive confirmation messages
 - View reservation logs
 
-The entire workflow is structured using design patterns for modularity, maintainability, and extensibility.
+The entire workflow is structured using design patterns for modularity, maintainability, and extensibility.  :contentReference[oaicite:1]{index=1}
 
 ---
 
@@ -42,8 +43,12 @@ Ensures only one instance of the reservation manager exists.
 
 Used for:
 - Central reservation management
-- Avoiding duplicate conflicts
-- System coordination
+- Maintaining a single list of reservations
+- Coordinating notifications to observers
+
+Why:
+- Prevents data inconsistency
+- Guarantees a single source of truth  :contentReference[oaicite:2]{index=2}
 
 ---
 
@@ -53,11 +58,15 @@ Creates sport field objects dynamically based on user choice.
 **Implementation:**
 - `FieldFactory`
 
-**Creates:**
-- `TennisField`
+**Creates (by type or subtype):**
 - `SoccerField`
+- `TennisField`
 - `PadelField`
-- `BasketballCourt`
+
+Why:
+- Centralizes creation logic
+- UI does not depend on concrete classes
+- Easy to add new field types  :contentReference[oaicite:3]{index=3}
 
 ---
 
@@ -73,6 +82,15 @@ Notifies components when reservation events occur.
 - `AdminDashboard`
 - `AuditLog`
 
+How it works:
+1. Observers register with `ReservationManager`
+2. On create/cancel, manager calls `notifyObservers()`
+3. All observers update automatically
+
+Why:
+- Loose coupling
+- Easy to add new notification channels  :contentReference[oaicite:4]{index=4}
+
 ---
 
 ### 🔹 Command Pattern
@@ -86,27 +104,49 @@ Encapsulates user operations as command objects.
 **Invoker:**
 - `CommandInvoker`
 
+How it works:
+- Commands wrap actions (`execute()`)
+- Invoker triggers execution
+- Result (e.g., created reservation) can be retrieved
+
+Why:
+- Actions as objects
+- Enables logging, queueing, and future undo/redo  :contentReference[oaicite:5]{index=5}
+
 ---
 
 ### 🔹 Decorator Pattern
 Adds optional add-ons to reservations dynamically.
 
 **Decorators:**
-- `LightingDecorator`
-- `EquipmentDecorator`
-- `RefreshmentDecorator`
+- `LightingDecorator` (+$10)
+- `EquipmentDecorator` (+$8)
+- `RefreshmentDecorator` (+$5)
 
 **Core:**
 - `ReservationCost`
 - `BaseReservationCost`
 - `AddOnDecorator`
 
+Example:
+```java
+ReservationCost cost = new BaseReservationCost(field);
+cost = new LightingDecorator(cost);
+cost = new EquipmentDecorator(cost);
+cost = new RefreshmentDecorator(cost);
+```
+
+Why:
+- Stack features in any order
+- No subclass explosion
+- Easy extension  :contentReference[oaicite:6]{index=6}
+
 ---
 
 ### 🔹 Chain of Responsibility Pattern
 Validates contact and reservation data through independent rules.
 
-**Handlers:**
+**Handlers (in order):**
 - `RequiredFieldsHandler`
 - `EmailFormatHandler`
 - `PhoneFormatHandler`
@@ -116,6 +156,21 @@ Validates contact and reservation data through independent rules.
 - `BaseContactHandler`
 - `ContactHandler`
 - `ValidationResult`
+
+Setup:
+```java
+ContactHandler chain = new RequiredFieldsHandler();
+chain.setNext(new EmailFormatHandler())
+     .setNext(new PhoneFormatHandler())
+     .setNext(new DuplicateUserCheckHandler());
+
+ValidationResult result = chain.handle(input);
+```
+
+Why:
+- One responsibility per handler
+- Stops at first failure
+- Reorder/add rules easily  :contentReference[oaicite:7]{index=7}
 
 ---
 
@@ -129,7 +184,7 @@ Validates contact and reservation data through independent rules.
 ✔ Admin dashboard  
 ✔ Add-on pricing logic  
 ✔ Clean architecture  
-✔ Extendable design
+✔ Extendable design  :contentReference[oaicite:8]{index=8}
 
 ---
 
@@ -144,17 +199,17 @@ src/App/Main.java
 
 3. The GUI will appear.
 4. Select a field and complete reservation details.
-5. Confirm booking to see notifications and logs.
+5. Confirm booking to see notifications and logs.  :contentReference[oaicite:9]{index=9}
 
 ---
 
 ## Example Console Output
 
 ```
-[EMAIL] Event-CREATED -> UserEmail | Tennis | 2025-12-02 08:00-09:00 | $38.00 | CONFIRMED
-[DASH] CREATED -> UserName | Tennis | 2025-12-02 08:00-09:00 | $38.00 | CONFIRMED
-[AUDIT] CREATED -> UserName | Tennis | 2025-12-02 08:00-09:00 | $38.00 | CONFIRMED
-[CMD] Reserved -> UserName | Tennis | 2025-12-02 08:00-09:00 | $38.00 | CONFIRMED
+[EMAIL] Sending email to: user@email.com
+[DASHBOARD] Reservation CREATED
+[AUDIT] Logging: CREATED
+[CMD] Reservation executed
 ```
 
 ---
@@ -180,29 +235,30 @@ SportsReservationSystem/
 │   ├── Command
 │   ├── CommandInvoker
 │   ├── ReserveCommand
-│   ├── ModifyCommand
-│   └── CancelCommand
+│   └── (Other commands)
 │
 ├── Decorator/
 │   ├── ReservationCost
 │   ├── BaseReservationCost
 │   ├── AddOnDecorator
-│   ├── EquipmentDecorator
 │   ├── LightingDecorator
+│   ├── EquipmentDecorator
 │   └── RefreshmentDecorator
 │
 ├── factory/
 │   ├── FieldFactory
 │
 ├── model/
+│   ├── SportType
+│   ├── FieldSubtype
 │   ├── Field
-│   ├── TennisField
 │   ├── SoccerField
+│   ├── TennisField
 │   ├── PadelField
-│   ├── Reservation
-│   ├── ReservationStatus
 │   ├── User
-│   └── Timeslot
+│   ├── Timeslot
+│   ├── Reservation
+│   └── ReservationStatus
 │
 ├── Observer/
 │   ├── Observer
@@ -228,26 +284,27 @@ SportsReservationSystem/
 
 ## Technologies Used
 
+- Java
 - Java Swing
 - IntelliJ IDEA
-- Object-Oriented Design Patterns
+- Object-Oriented Design Patterns  :contentReference[oaicite:10]{index=10}
 
 ---
+
 ## Sources Used
 
 - Course lecture slides and class materials (CIS3303 – Object-Oriented Design)
+- Project guide PDF: *Sports Field Reservation System – Complete Guide* \
 
+---
 
 ## Author
 
-**Jose ArayaSancho**
-
-**Sebastian Rodriguez**
-
+**Jose Araya-Sancho**  
+**Sebastian Rodriguez**  
 **Yasir Dar**
 
-New College of Florida
-
+New College of Florida  
 CIS3303 – Object-Oriented Design
 
 ---
