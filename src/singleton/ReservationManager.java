@@ -8,7 +8,6 @@ import Observer.Observer;
 import Observer.Subject;
 
 import java.util.*;
-import java.util.UUID;
 
 public final class ReservationManager implements Subject {
     private static ReservationManager instance;
@@ -59,12 +58,17 @@ public final class ReservationManager implements Subject {
                 });
     }
 
-    // Adds a new reservation if the timeslot is available
+    // Original method for backward compatibility
     public Reservation addReservation(User user, Field field, Timeslot slot, double cost) {
+        return addReservation(user, field, slot, cost, new HashSet<>());
+    }
+
+    // New method that properly stores add-ons
+    public Reservation addReservation(User user, Field field, Timeslot slot, double cost, Set<AddOnType> addOns) {
         if (!isAvailable(field, slot))
             throw new IllegalStateException("Timeslot not available for this field");
         saveUser(user);
-        Reservation r = new Reservation(user, field, slot, cost);
+        Reservation r = new Reservation(user, field, slot, cost, addOns);
         reservations.add(r);
         notifyObservers(r, "CREATED");
         return r;
@@ -86,8 +90,13 @@ public final class ReservationManager implements Subject {
         notifyObservers(reservation, "CANCELED");
     }
 
-    // Modifies an existing reservation, it updates the total cost
+    // Modifies an existing reservation cost only
     public void modifyReservation(Reservation reservation, double newCost) {
+        modifyReservation(reservation, newCost, reservation.getAddOns());
+    }
+
+    // Modifies an existing reservation with new cost and add-ons
+    public void modifyReservation(Reservation reservation, double newCost, Set<AddOnType> newAddOns) {
         if (reservation == null) {
             throw new IllegalArgumentException("Reservation cannot be null");
         }
@@ -95,8 +104,9 @@ public final class ReservationManager implements Subject {
             throw new IllegalStateException("Cannot modify a canceled reservation");
         }
 
-        // Update cost
+        // Update cost and add-ons
         reservation.setTotalCost(newCost);
+        reservation.setAddOns(newAddOns);
 
         notifyObservers(reservation, "MODIFIED");
     }

@@ -3,6 +3,9 @@
 
 package model;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public final class Reservation {
@@ -13,9 +16,21 @@ public final class Reservation {
     private double totalCost;
     private ReservationStatus status = ReservationStatus.CONFIRMED;
 
+    // Store the actual add-ons selected (proper use of data, decorators handle cost calculation)
+    private final Set<AddOnType> addOns;
+
     public Reservation(User user, Field field, Timeslot timeslot, double totalCost) {
-        this.user = user; this.field = field; this.timeslot = timeslot; this.totalCost = totalCost;
+        this(user, field, timeslot, totalCost, new HashSet<>());
     }
+
+    public Reservation(User user, Field field, Timeslot timeslot, double totalCost, Set<AddOnType> addOns) {
+        this.user = user;
+        this.field = field;
+        this.timeslot = timeslot;
+        this.totalCost = totalCost;
+        this.addOns = new HashSet<>(addOns);
+    }
+
     public UUID getId() {
         return id;
     }
@@ -35,9 +50,25 @@ public final class Reservation {
         return status;
     }
 
+    // Returns an unmodifiable view of the add-ons
+    public Set<AddOnType> getAddOns() {
+        return Collections.unmodifiableSet(addOns);
+    }
+
+    public boolean hasAddOn(AddOnType type) {
+        return addOns.contains(type);
+    }
+
     public void setTotalCost(double totalCost) {
         this.totalCost = totalCost;
     }
+
+    // Update add-ons when modifying reservation
+    public void setAddOns(Set<AddOnType> newAddOns) {
+        this.addOns.clear();
+        this.addOns.addAll(newAddOns);
+    }
+
     public void cancel() {
         this.status = ReservationStatus.CANCELED;
     }

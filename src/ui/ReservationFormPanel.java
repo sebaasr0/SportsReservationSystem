@@ -19,6 +19,8 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ReservationFormPanel extends JPanel {
 
@@ -137,6 +139,28 @@ public class ReservationFormPanel extends JPanel {
         );
         border.setTitleColor(Color.WHITE);
         return border;
+    }
+
+    /**
+     * Calculates cost using the Decorator pattern.
+     * Decorators are used for their intended purpose: dynamic cost calculation.
+     * The add-ons Set is stored separately in the Reservation for easy retrieval.
+     */
+    private ReservationCost buildDecoratedCost(Field field, Set<AddOnType> addOns) {
+        ReservationCost cost = new BaseReservationCost(field);
+
+        // Apply decorators based on selected add-ons
+        if (addOns.contains(AddOnType.LIGHTING)) {
+            cost = new LightingDecorator(cost);
+        }
+        if (addOns.contains(AddOnType.EQUIPMENT)) {
+            cost = new EquipmentDecorator(cost);
+        }
+        if (addOns.contains(AddOnType.REFRESHMENTS)) {
+            cost = new RefreshmentDecorator(cost);
+        }
+
+        return cost;
     }
 
     //top panel
@@ -392,7 +416,7 @@ public class ReservationFormPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        //Get base price from the ACTUAL field subtype stored in reservation
+        // Get base price from the field
         double basePrice = reservation.getField().getBasePrice();
         double currentCost = reservation.getTotalCost();
 
@@ -400,28 +424,9 @@ public class ReservationFormPanel extends JPanel {
         int duration = reservation.getTimeslot().getEnd().getHour() - reservation.getTimeslot().getStart().getHour();
         if (duration <= 0) duration = 1;
 
-        // Calculate HOURLY cost first, then determine add-ons
-        double hourlyCost = currentCost / duration;
-        double hourlyAddOns = hourlyCost - basePrice;
-
-        // Determine which add-ons are selected based on HOURLY add-on cost
-        boolean hasLighting = false;
-        boolean hasEquipment = false;
-        boolean hasRefreshments = false;
-
-        // Check combinations (with small tolerance for floating point)
-        double remaining = hourlyAddOns;
-        if (remaining >= 9.99) {
-            hasLighting = true;
-            remaining -= 10.0;
-        }
-        if (remaining >= 7.99) {
-            hasEquipment = true;
-            remaining -= 8.0;
-        }
-        if (remaining >= 4.99) {
-            hasRefreshments = true;
-        }
+        // Get add-ons directly from the Reservation - NO MORE REVERSE ENGINEERING!
+        // This is the proper way - the data is stored, not calculated backwards
+        Set<AddOnType> currentAddOns = reservation.getAddOns();
 
         // Info panel
         JPanel infoPanel = new JPanel(new GridLayout(7, 1, 5, 5));
@@ -444,10 +449,10 @@ public class ReservationFormPanel extends JPanel {
         JCheckBox modEquip = new JCheckBox("Equipment ($8/hr)");
         JCheckBox modRefresh = new JCheckBox("Refreshments ($5/hr)");
 
-        // Pre-select checkboxes based on current add-ons
-        modLighting.setSelected(hasLighting);
-        modEquip.setSelected(hasEquipment);
-        modRefresh.setSelected(hasRefreshments);
+        // Pre-select checkboxes based on stored add-ons - CLEAN AND SIMPLE!
+        modLighting.setSelected(currentAddOns.contains(AddOnType.LIGHTING));
+        modEquip.setSelected(currentAddOns.contains(AddOnType.EQUIPMENT));
+        modRefresh.setSelected(currentAddOns.contains(AddOnType.REFRESHMENTS));
 
         addonsPanel.add(new JLabel("Select/deselect add-ons:"));
         addonsPanel.add(modLighting);
@@ -461,17 +466,19 @@ public class ReservationFormPanel extends JPanel {
         final int finalDuration = duration;
         JButton applyBtn = new JButton("Apply Changes");
         applyBtn.addActionListener(e -> {
-            // Calculate new hourly cost based on selected add-ons
-            double newHourlyCost = basePrice;
-            if (modLighting.isSelected()) newHourlyCost += 10.0;
-            if (modEquip.isSelected()) newHourlyCost += 8.0;
-            if (modRefresh.isSelected()) newHourlyCost += 5.0;
+            // Build new add-ons set from checkboxes
+            Set<AddOnType> newAddOns = new HashSet<>();
+            if (modLighting.isSelected()) newAddOns.add(AddOnType.LIGHTING);
+            if (modEquip.isSelected()) newAddOns.add(AddOnType.EQUIPMENT);
+            if (modRefresh.isSelected()) newAddOns.add(AddOnType.REFRESHMENTS);
 
-            // Multiply by duration for total cost
+            // Use Decorator pattern to calculate new cost
+            ReservationCost decoratedCost = buildDecoratedCost(reservation.getField(), newAddOns);
+            double newHourlyCost = decoratedCost.getCost();
             double newTotalCost = newHourlyCost * finalDuration;
 
             // Check if anything changed
-            if (Math.abs(newTotalCost - currentCost) < 0.01) {
+            if (Math.abs(newTotalCost - currentCost) < 0.01 && newAddOns.equals(currentAddOns)) {
                 JOptionPane.showMessageDialog(modifyDialog,
                         "No changes were made to the add-ons.",
                         "No Changes", JOptionPane.INFORMATION_MESSAGE);
@@ -479,7 +486,8 @@ public class ReservationFormPanel extends JPanel {
             }
 
             try {
-                ModifyCommand cmd = new ModifyCommand(reservation, newTotalCost);
+                // Pass both new cost and new add-ons to the command
+                ModifyCommand cmd = new ModifyCommand(reservation, newTotalCost, newAddOns);
                 invoker.setCommand(cmd);
                 invoker.execute();
 
@@ -525,22 +533,23 @@ public class ReservationFormPanel extends JPanel {
                 return;
             }
 
-            // Build field and cost with decorators
+            // Build field
             Field field = FieldFactory.createField(selectedSubtype);
+
+            // Collect selected add-ons into a Set
+            Set<AddOnType> selectedAddOns = new HashSet<>();
+            if (chkLighting.isSelected()) selectedAddOns.add(AddOnType.LIGHTING);
+            if (chkEquip.isSelected()) selectedAddOns.add(AddOnType.EQUIPMENT);
+            if (chkRefresh.isSelected()) selectedAddOns.add(AddOnType.REFRESHMENTS);
 
             // Get duration
             int duration = (Integer) durCombo.getSelectedItem();
 
-            // Calculate hourly cost first, then multiply by duration
-            ReservationCost hourlyCost = new BaseReservationCost(field);
-            if (chkLighting.isSelected()) hourlyCost = new LightingDecorator(hourlyCost);
-            if (chkEquip.isSelected()) hourlyCost = new EquipmentDecorator(hourlyCost);
-            if (chkRefresh.isSelected()) hourlyCost = new RefreshmentDecorator(hourlyCost);
-
-            // Get hourly rate and calculate total
-            final double hourlyRate = hourlyCost.getCost();
+            // Use Decorator pattern for cost calculation - THIS IS THE PROPER USE!
+            ReservationCost decoratedCost = buildDecoratedCost(field, selectedAddOns);
+            final double hourlyRate = decoratedCost.getCost();
             final double totalCost = hourlyRate * duration;
-            final String description = hourlyCost.getDescription();
+            final String description = decoratedCost.getDescription();
 
             // Create a cost object with the total (for the command)
             ReservationCost finalCost = new ReservationCost() {
@@ -559,9 +568,9 @@ public class ReservationFormPanel extends JPanel {
             int startHour = getSelectedHour();
             Timeslot slot = new Timeslot(selectedDate, LocalTime.of(startHour, 0), LocalTime.of(startHour + duration, 0));
 
-            // Create user and execute reservation command
+            // Create user and execute reservation command WITH add-ons
             User user = new User(input.name(), input.email(), input.phone());
-            ReserveCommand cmd = new ReserveCommand(user, selectedSubtype, slot, finalCost);
+            ReserveCommand cmd = new ReserveCommand(user, selectedSubtype, slot, finalCost, selectedAddOns);
             invoker.setCommand(cmd);
             invoker.execute();
 

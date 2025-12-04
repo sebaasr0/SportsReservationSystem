@@ -2,8 +2,11 @@
 // This is a Concrete Command that encapsulates the action of modifying a reservation.
 package Command;
 
+import model.AddOnType;
 import model.Reservation;
 import singleton.ReservationManager;
+
+import java.util.Set;
 
 public final class ModifyCommand implements Command {
 
@@ -13,16 +16,25 @@ public final class ModifyCommand implements Command {
     // New cost value for the modification
     private final double newCost;
 
-    // Constructor for modifying the cost
+    // New add-ons for the modification
+    private final Set<AddOnType> newAddOns;
+
+    // Constructor for modifying cost only (backward compatible)
     public ModifyCommand(Reservation reservation, double newCost) {
+        this(reservation, newCost, reservation.getAddOns());
+    }
+
+    // Constructor for modifying cost and add-ons
+    public ModifyCommand(Reservation reservation, double newCost, Set<AddOnType> newAddOns) {
         this.reservation = reservation;
         this.newCost = newCost;
+        this.newAddOns = newAddOns;
     }
 
     // Executes the modification action
     @Override
     public void execute() {
-        ReservationManager.getInstance().modifyReservation(reservation, newCost); // Calls the ReservationManager singleton to modify the reservation
+        ReservationManager.getInstance().modifyReservation(reservation, newCost, newAddOns);
         System.out.println("[COMMAND] Modified -> " + reservation.getId());
     }
 
