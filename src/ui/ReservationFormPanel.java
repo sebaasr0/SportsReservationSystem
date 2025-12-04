@@ -32,7 +32,9 @@ public class ReservationFormPanel extends JPanel {
 
     // Date selection - next 14 days
     private final JComboBox<String> dateCombo = new JComboBox<>();
-    private final JComboBox<Integer> hourCombo = new JComboBox<>(new Integer[]{8,9,10,11,12,13,14,15,16,17,18,19,20});
+    private final JComboBox<String> hourCombo = new JComboBox<>(new String[]{"8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+            "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
+            "6:00 PM", "7:00 PM", "8:00 PM"});
     private final JComboBox<Integer> durCombo = new JComboBox<>(new Integer[]{1,2});
 
     private final JCheckBox chkLighting = new JCheckBox("Lighting (+$10)");
@@ -466,7 +468,7 @@ public class ReservationFormPanel extends JPanel {
     // Handles the reservation process
     private void onReserve() {
         try {
-            ContactInput input = new ContactInput(nameField.getText(), emailField.getText(), phoneField.getText(), true);
+            ContactInput input = new ContactInput(nameField.getText(), emailField.getText(), phoneField.getText());
 
             ContactHandler chain = new RequiredFieldsHandler();
             chain.setNext(new EmailFormatHandler())

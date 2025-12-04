@@ -14,15 +14,12 @@ public final class ContactInput {
     // User's phone number - validated for format
     private final String phone;
 
-    // Whether user accepted terms and conditions
-    private final boolean terms;
 
     // Constructor initializes all fields
-    public ContactInput(String name, String email, String phone, boolean terms) {
+    public ContactInput(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.terms = terms;
     }
 
     // Getter for name
@@ -40,8 +37,5 @@ public final class ContactInput {
         return phone;
     }
 
-    // Getter for terms acceptance
-    public boolean terms() {
-        return terms;
-    }
+
 }
