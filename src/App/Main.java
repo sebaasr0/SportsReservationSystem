@@ -1,3 +1,6 @@
+//Yasir Pervaiz
+// Main application entry point
+
 package App;
 
 import ui.MainFrame;
