@@ -14,8 +14,8 @@ public class SubtypeDrawingPanel extends JPanel {
     public SubtypeDrawingPanel(FieldSubtype subtype) {
         this.subtype = subtype;
         setPreferredSize(new Dimension(220, 180));
-        setBackground(Color.WHITE);
-        setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+        setBackground(new Color(81, 101, 170));
+        setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 3));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
     
@@ -48,13 +48,13 @@ public class SubtypeDrawingPanel extends JPanel {
         
         // Hover effect
         if (hovered && !selected) {
-            g2d.setColor(new Color(240, 248, 255));
+            g2d.setColor(new Color(136, 147, 159));
             g2d.fillRect(0, 0, w, h);
         }
         
         // Selection border
         if (selected) {
-            g2d.setColor(new Color(0, 120, 215));
+            g2d.setColor(new Color(245, 16, 234));
             g2d.setStroke(new BasicStroke(3));
             g2d.drawRect(2, 2, w - 4, h - 4);
         }
@@ -82,7 +82,7 @@ public class SubtypeDrawingPanel extends JPanel {
         g2d.drawString(label, (w - fm.stringWidth(label)) / 2, h - 28);
         
         // Price
-        g2d.setColor(new Color(0, 128, 0));
+        g2d.setColor(new Color(113, 255, 113));
         g2d.setFont(new Font("SansSerif", Font.PLAIN, 12));
         String price = String.format("$%.2f/hour", subtype.getBasePrice());
         fm = g2d.getFontMetrics();

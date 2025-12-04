@@ -14,8 +14,8 @@ public class FieldDrawingPanel extends JPanel {
     public FieldDrawingPanel(SportType sportType) {
         this.sportType = sportType;
         setPreferredSize(new Dimension(200, 160));
-        setBackground(Color.WHITE);
-        setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+        setBackground(new Color(81, 101, 170));
+        setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 3));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
     
@@ -48,13 +48,13 @@ public class FieldDrawingPanel extends JPanel {
         
         // Hover effect
         if (hovered && !selected) {
-            g2d.setColor(new Color(240, 248, 255));
+            g2d.setColor(new Color(136, 147, 159));
             g2d.fillRect(0, 0, w, h);
         }
         
         // Selection border
         if (selected) {
-            g2d.setColor(new Color(0, 120, 215));
+            g2d.setColor(new Color(245, 16, 234));
             g2d.setStroke(new BasicStroke(3));
             g2d.drawRect(2, 2, w - 4, h - 4);
         }

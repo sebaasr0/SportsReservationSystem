@@ -9,13 +9,6 @@ import ui.SubtypeSelectionScreen;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Main application frame that manages navigation between screens
- * using CardLayout:
- * 1. Field Selection Screen (Soccer, Tennis, Padel)
- * 2. Subtype Selection Screen (based on selected sport)
- * 3. Reservation Form (final booking)
- */
 public class MainFrame extends JFrame {
     
     private static final String FIELD_SELECTION = "FIELD_SELECTION";
@@ -41,7 +34,7 @@ public class MainFrame extends JFrame {
         
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
-        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBackground(new Color(20, 30, 70));
         
         // Initialize the first screen
         initFieldSelectionScreen();
