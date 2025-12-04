@@ -56,7 +56,7 @@ public class ReservationFormPanel extends JPanel {
         this.onNewReservation = onNewReservation;
 
         setLayout(new BorderLayout(15, 15));
-        setBackground(new Color(68, 68, 81));
+        setBackground(new Color(24, 24, 27));  // Charcoal background
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         // Initialize date combo with next 14 days
@@ -125,36 +125,36 @@ public class ReservationFormPanel extends JPanel {
     // Helper method to create white label
     private JLabel createWhiteLabel(String text) {
         JLabel label = new JLabel(text);
-        label.setForeground(Color.WHITE);
+        label.setForeground(Color.WHITE);  // White text
         return label;
     }
 
     // Helper method to create styled border with white title
     private TitledBorder createWhiteTitledBorder(String title) {
         TitledBorder border = BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.WHITE),
+                BorderFactory.createLineBorder(new Color(161, 161, 170)),  // Zinc border
                 title
         );
-        border.setTitleColor(Color.WHITE);
+        border.setTitleColor(Color.WHITE);  // White title
         return border;
     }
 
     //top panel
     private JPanel buildTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(68, 68, 81));
+        panel.setBackground(new Color(24, 24, 27));  // Charcoal background
 
         JButton backButton = new JButton("← Back");
         backButton.addActionListener(e -> onBack.run());
         panel.add(backButton, BorderLayout.WEST);
 
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(68, 68, 81));
+        titlePanel.setBackground(new Color(24, 24, 27));  // Charcoal background
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
 
         JLabel titleLabel = new JLabel("Complete Your Reservation");
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.WHITE);  // White text
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         String fieldInfo = selectedSubtype.getSportType().name().charAt(0) +
@@ -162,7 +162,7 @@ public class ReservationFormPanel extends JPanel {
                 " - " + selectedSubtype.getDisplayName() +
                 " ($" + String.format("%.2f", selectedSubtype.getBasePrice()) + "/hour)";
         JLabel fieldLabel = new JLabel("Selected: " + fieldInfo);
-        fieldLabel.setForeground(new Color(100, 255, 150));
+        fieldLabel.setForeground(new Color(34, 211, 238));  // Cyan for price/success
         fieldLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         titlePanel.add(titleLabel);
@@ -180,7 +180,7 @@ public class ReservationFormPanel extends JPanel {
 
     private JPanel buildFormPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(new Color(68, 68, 81));
+        panel.setBackground(new Color(24, 24, 27));  // Charcoal background
 
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(8, 8, 8, 8);
@@ -188,7 +188,7 @@ public class ReservationFormPanel extends JPanel {
 
         // Date & Time Selection
         JPanel timePanel = new JPanel(new GridLayout(3, 2, 10, 5));
-        timePanel.setBackground(new Color(68, 68, 81));
+        timePanel.setBackground(new Color(39, 39, 42));  // Dark Gray panel
         timePanel.setBorder(createWhiteTitledBorder("Date & Time Selection"));
         timePanel.add(createWhiteLabel("Date:"));
         timePanel.add(dateCombo);
@@ -202,7 +202,7 @@ public class ReservationFormPanel extends JPanel {
 
         // Contact Info
         JPanel contactPanel = new JPanel(new GridLayout(3, 2, 10, 5));
-        contactPanel.setBackground(new Color(68, 68, 81));
+        contactPanel.setBackground(new Color(39, 39, 42));  // Dark Gray panel
         contactPanel.setBorder(createWhiteTitledBorder("Contact Information"));
         contactPanel.add(createWhiteLabel("Full Name:"));
         contactPanel.add(nameField);
@@ -216,16 +216,16 @@ public class ReservationFormPanel extends JPanel {
 
         // Add-ons
         JPanel addonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
-        addonsPanel.setBackground(new Color(68, 68, 81));
+        addonsPanel.setBackground(new Color(39, 39, 42));  // Dark Gray panel
         addonsPanel.setBorder(createWhiteTitledBorder("Add-ons (Optional - per hour)"));
 
         // Style checkboxes with white text
-        chkLighting.setForeground(Color.WHITE);
-        chkLighting.setBackground(new Color(68, 68, 81));
-        chkEquip.setForeground(Color.WHITE);
-        chkEquip.setBackground(new Color(68, 68, 81));
-        chkRefresh.setForeground(Color.WHITE);
-        chkRefresh.setBackground(new Color(68, 68, 81));
+        chkLighting.setForeground(Color.WHITE);  // White text
+        chkLighting.setBackground(new Color(39, 39, 42));  // Dark Gray
+        chkEquip.setForeground(Color.WHITE);  // White text
+        chkEquip.setBackground(new Color(39, 39, 42));  // Dark Gray
+        chkRefresh.setForeground(Color.WHITE);  // White text
+        chkRefresh.setBackground(new Color(39, 39, 42));  // Dark Gray
 
         addonsPanel.add(chkLighting);
         addonsPanel.add(chkEquip);
@@ -250,7 +250,7 @@ public class ReservationFormPanel extends JPanel {
 
     private JPanel buildBottomPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panel.setBackground(new Color(68, 68, 81));
+        panel.setBackground(new Color(24, 24, 27));  // Charcoal background
 
         JButton viewButton = new JButton("View Reservations");
         viewButton.addActionListener(e -> showReservationsDialog());
