@@ -6,7 +6,7 @@ import Decorator.ReservationCost;
 import factory.FieldFactory;
 import model.*;
 import singleton.ReservationManager;
-// Encapsulates the action of creating a new reservation
+
 public final class ReserveCommand implements Command {
     private final User user;
     private final SportType sport;
@@ -22,8 +22,8 @@ public final class ReserveCommand implements Command {
     }
     // Executes the reservation creation logic
     public void execute() {
-        Field field = FieldFactory.createField(sport);
-        result = ReservationManager.getInstance()
+        Field field = FieldFactory.createField(sport); //calls factory
+        result = ReservationManager.getInstance() //calls singleton
                 .addReservation(user, field, slot, cost.getCost());
         System.out.println("[COMMAND] Reserved -> " + result);
     }

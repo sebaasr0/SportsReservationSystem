@@ -1,5 +1,5 @@
 //Jose Araya
-// This is the Command interface for the Command Pattern.
+// This is the Command interface
 package Command;
 
 public interface Command {
