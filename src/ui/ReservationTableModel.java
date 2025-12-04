@@ -14,6 +14,14 @@ public class ReservationTableModel extends AbstractTableModel {
     public ReservationTableModel(List<Reservation> data) { this.data = data; }
     public void setData(List<Reservation> data) { this.data = data; fireTableDataChanged(); }
 
+    // Returns the Reservation object at the specified row index
+    public Reservation getReservationAt(int row) {
+        if (row >= 0 && row < data.size()) {
+            return data.get(row);
+        }
+        return null;
+    }
+
     public int getRowCount() { return data.size(); }
     public int getColumnCount() { return cols.length; }
     public String getColumnName(int c) { return cols[c]; }

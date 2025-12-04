@@ -14,6 +14,7 @@ import singleton.ReservationManager;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.ListSelectionModel;
 import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -228,31 +229,241 @@ public class ReservationFormPanel extends JPanel {
 
         return panel;
     }
-
+    // Shows the reservations dialog with options to cancel or modify
     private void showReservationsDialog() {
-        tableModel.setData(ReservationManager.getInstance().listAll());
 
+        ReservationTableModel dialogTableModel = new ReservationTableModel(ReservationManager.getInstance().listAll());
+        JTable dialogTable = new JTable(dialogTableModel);
+
+        // Configure table to maintain selection
+        dialogTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        dialogTable.setRowSelectionAllowed(true);
+        dialogTable.setFocusable(true);
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "All Reservations", true);
-        dialog.setSize(800, 350);
+        dialog.setSize(900, 400);
         dialog.setLocationRelativeTo(this);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        panel.add(new JScrollPane(dialogTable), BorderLayout.CENTER);
 
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
 
+        // Cancel Button
+        JButton cancelBtn = new JButton("Cancel Reservation");
+        cancelBtn.setFocusable(false);
+        cancelBtn.addActionListener(e -> onCancelReservation(dialog, dialogTable, dialogTableModel));
+        btnPanel.add(cancelBtn);
+
+        // Modify Button
+        JButton modifyBtn = new JButton("Modify Reservation");
+        modifyBtn.setFocusable(false);
+        modifyBtn.addActionListener(e -> onModifyReservation(dialog, dialogTable, dialogTableModel));
+        btnPanel.add(modifyBtn);
+
+        // Close Button
         JButton closeBtn = new JButton("Close");
         closeBtn.addActionListener(e -> dialog.dispose());
-
         btnPanel.add(closeBtn);
+
         panel.add(btnPanel, BorderLayout.SOUTH);
 
         dialog.setContentPane(panel);
         dialog.setVisible(true);
     }
 
+    // Handles the cancel reservation action
+    private void onCancelReservation(JDialog parentDialog, JTable dialogTable, ReservationTableModel dialogTableModel) {
+        int selectedRow = dialogTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(parentDialog,
+                    "Please select a reservation to cancel.",
+                    "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        // Get the selected reservation
+        Reservation reservation = dialogTableModel.getReservationAt(selectedRow);
+        if (reservation == null) {
+            JOptionPane.showMessageDialog(parentDialog,
+                    "Could not find the selected reservation.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        // Check if already canceled
+        if (reservation.getStatus() == model.ReservationStatus.CANCELED) {
+            JOptionPane.showMessageDialog(parentDialog,
+                    "This reservation is already canceled.",
+                    "Already Canceled", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        // Confirm cancellation
+        int confirm = JOptionPane.showConfirmDialog(parentDialog,
+                "Are you sure you want to cancel this reservation?\n\n" +
+                        "User: " + reservation.getUser().getName() + "\n" +
+                        "Field: " + reservation.getField().getFullDescription() + "\n" +
+                        "Date: " + reservation.getTimeslot().getDate() + "\n" +
+                        "Time: " + reservation.getTimeslot().getStart() + " - " + reservation.getTimeslot().getEnd(),
+                "Confirm Cancellation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                CancelCommand cmd = new CancelCommand(reservation);
+                invoker.setCommand(cmd);
+                invoker.execute();
+                // Refresh table data
+                dialogTableModel.setData(ReservationManager.getInstance().listAll());
+                JOptionPane.showMessageDialog(parentDialog,
+                        "Reservation canceled successfully!",
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(parentDialog,
+                        "Error canceling reservation: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // Handles the modify reservation action
+    private void onModifyReservation(JDialog parentDialog, JTable dialogTable, ReservationTableModel dialogTableModel) {
+        int selectedRow = dialogTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(parentDialog,
+                    "Please select a reservation to modify.",
+                    "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        // Get the selected reservation
+        Reservation reservation = dialogTableModel.getReservationAt(selectedRow);
+        if (reservation == null) {
+            JOptionPane.showMessageDialog(parentDialog,
+                    "Could not find the selected reservation.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        // Check if canceled
+        if (reservation.getStatus() == model.ReservationStatus.CANCELED) {
+            JOptionPane.showMessageDialog(parentDialog,
+                    "Cannot modify a canceled reservation.",
+                    "Cannot Modify", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Show modification dialog
+        showModifyDialog(parentDialog, reservation, dialogTableModel);
+    }
+
+    // Shows a dialog to modify the reservation cost (add-ons)
+    private void showModifyDialog(JDialog parentDialog, Reservation reservation, ReservationTableModel dialogTableModel) {
+        JDialog modifyDialog = new JDialog(parentDialog, "Modify Reservation", true);
+        modifyDialog.setSize(450, 350);
+        modifyDialog.setLocationRelativeTo(parentDialog);
+
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+
+        // Calculate base price and determine which add-ons are currently selected
+        double basePrice = reservation.getField().getBasePrice();
+        double currentCost = reservation.getTotalCost();
+        double addOnsCost = currentCost - basePrice;
+
+        // Determine which add-ons are likely selected based on cost
+        boolean hasLighting = false;
+        boolean hasEquipment = false;
+        boolean hasRefreshments = false;
+
+        // Check combinations to determine add-ons (greedy approach from highest to lowest)
+        double remaining = addOnsCost;
+        if (remaining >= 10.0) {
+            hasLighting = true;
+            remaining -= 10.0;
+        }
+        if (remaining >= 8.0) {
+            hasEquipment = true;
+            remaining -= 8.0;
+        }
+        if (remaining >= 5.0) {
+            hasRefreshments = true;
+            remaining -= 5.0;
+        }
+
+        // Info panel
+        JPanel infoPanel = new JPanel(new GridLayout(5, 1, 5, 5));
+        infoPanel.setBorder(BorderFactory.createTitledBorder("Current Reservation"));
+        infoPanel.add(new JLabel("User: " + reservation.getUser().getName()));
+        infoPanel.add(new JLabel("Field: " + reservation.getField().getFullDescription()));
+        infoPanel.add(new JLabel("Date: " + reservation.getTimeslot().getDate()));
+        infoPanel.add(new JLabel("Base Price: $" + String.format("%.2f", basePrice)));
+        infoPanel.add(new JLabel("Current Total: $" + String.format("%.2f", currentCost)));
+        panel.add(infoPanel, BorderLayout.NORTH);
+
+        // Add-ons modification panel
+        JPanel addonsPanel = new JPanel(new GridLayout(4, 1, 5, 5));
+        addonsPanel.setBorder(BorderFactory.createTitledBorder("Modify Add-ons (check/uncheck to add/remove)"));
+
+        JCheckBox modLighting = new JCheckBox("Lighting ($10)");
+        JCheckBox modEquip = new JCheckBox("Equipment ($8)");
+        JCheckBox modRefresh = new JCheckBox("Refreshments ($5)");
+
+        // Pre-select checkboxes based on current add-ons
+        modLighting.setSelected(hasLighting);
+        modEquip.setSelected(hasEquipment);
+        modRefresh.setSelected(hasRefreshments);
+
+        addonsPanel.add(new JLabel("Select/deselect add-ons:"));
+        addonsPanel.add(modLighting);
+        addonsPanel.add(modEquip);
+        addonsPanel.add(modRefresh);
+        panel.add(addonsPanel, BorderLayout.CENTER);
+
+        // Buttons panel
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        JButton applyBtn = new JButton("Apply Changes");
+        applyBtn.addActionListener(e -> {
+            // Calculate new total based on selected add-ons
+            double newCost = basePrice;
+            if (modLighting.isSelected()) newCost += 10.0;
+            if (modEquip.isSelected()) newCost += 8.0;
+            if (modRefresh.isSelected()) newCost += 5.0;
+
+            // Check if anything changed
+            if (Math.abs(newCost - currentCost) < 0.01) {
+                JOptionPane.showMessageDialog(modifyDialog,
+                        "No changes were made to the add-ons.",
+                        "No Changes", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            // Execute modification command
+            try {
+                ModifyCommand cmd = new ModifyCommand(reservation, newCost);
+                invoker.setCommand(cmd);
+                invoker.execute();
+
+                dialogTableModel.setData(ReservationManager.getInstance().listAll());
+                JOptionPane.showMessageDialog(modifyDialog,
+                        "Reservation modified successfully!\nNew total: $" + String.format("%.2f", newCost),
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                modifyDialog.dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(modifyDialog,
+                        "Error modifying reservation: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        btnPanel.add(applyBtn);
+
+        JButton cancelDialogBtn = new JButton("Cancel");
+        cancelDialogBtn.addActionListener(e -> modifyDialog.dispose());
+        btnPanel.add(cancelDialogBtn);
+
+        panel.add(btnPanel, BorderLayout.SOUTH);
+
+        modifyDialog.setContentPane(panel);
+        modifyDialog.setVisible(true);
+    }
+
+    // Handles the reservation process
     private void onReserve() {
         try {
             ContactInput input = new ContactInput(nameField.getText(), emailField.getText(), phoneField.getText(), true);
@@ -262,28 +473,33 @@ public class ReservationFormPanel extends JPanel {
                     .setNext(new PhoneFormatHandler())
                     .setNext(new DuplicateUserCheckHandler());
 
+            // Validate input through the chain
             ValidationResult vr = chain.handle(input);
             if (!vr.isOk()) {
                 JOptionPane.showMessageDialog(this, vr.getMessage(), "Validation", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
+            // Build field and cost with decorators
             Field field = FieldFactory.createField(selectedSubtype);
             ReservationCost cost = new BaseReservationCost(field);
             if (chkLighting.isSelected()) cost = new LightingDecorator(cost);
             if (chkEquip.isSelected()) cost = new EquipmentDecorator(cost);
             if (chkRefresh.isSelected()) cost = new RefreshmentDecorator(cost);
 
+            // Create timeslot
             LocalDate selectedDate = getSelectedDate();
             int startHour = (Integer) hourCombo.getSelectedItem();
             int dur = (Integer) durCombo.getSelectedItem();
             Timeslot slot = new Timeslot(selectedDate, LocalTime.of(startHour, 0), LocalTime.of(startHour + dur, 0));
 
+            // Create user and execute reservation command
             User user = new User(input.name(), input.email(), input.phone());
             ReserveCommand cmd = new ReserveCommand(user, selectedSubtype.getSportType(), slot, cost);
             invoker.setCommand(cmd);
             invoker.execute();
 
+            // Show success message
             JOptionPane.showMessageDialog(this,
                     "Reservation created!\n\n" +
                             "Field: " + field.getFullDescription() + "\n" +

@@ -8,6 +8,7 @@ import Observer.Observer;
 import Observer.Subject;
 
 import java.util.*;
+import java.util.UUID;
 
 public final class ReservationManager implements Subject {
     private static ReservationManager instance;
@@ -26,6 +27,16 @@ public final class ReservationManager implements Subject {
     // User management
     public boolean userExists(String email) {
         return email != null && usersByEmail.containsKey(email.toLowerCase());
+    }
+
+    // Checks if a user has any ACTIVE (CONFIRMED) reservations
+    // Returns false if all their reservations are canceled
+    public boolean userHasActiveReservation(String email) {
+        if (email == null) return false;
+        String lowerEmail = email.toLowerCase();
+        return reservations.stream()
+                .filter(r -> r.getStatus() == ReservationStatus.CONFIRMED)
+                .anyMatch(r -> r.getUser().getEmail().toLowerCase().equals(lowerEmail));
     }
 
     public void saveUser(User user) {
@@ -48,7 +59,7 @@ public final class ReservationManager implements Subject {
                 });
     }
 
-// Adds a new reservation if the timeslot is available
+    // Adds a new reservation if the timeslot is available
     public Reservation addReservation(User user, Field field, Timeslot slot, double cost) {
         if (!isAvailable(field, slot))
             throw new IllegalStateException("Timeslot not available for this field");
@@ -61,6 +72,33 @@ public final class ReservationManager implements Subject {
 
     public List<Reservation> listAll() {
         return new ArrayList<>(reservations);
+    }
+
+    // Cancels an existing reservation
+    public void cancelReservation(Reservation reservation) {
+        if (reservation == null) {
+            throw new IllegalArgumentException("Reservation cannot be null");
+        }
+        if (reservation.getStatus() == ReservationStatus.CANCELED) {
+            throw new IllegalStateException("Reservation is already canceled");
+        }
+        reservation.cancel();
+        notifyObservers(reservation, "CANCELED");
+    }
+
+    // Modifies an existing reservation, it updates the total cost
+    public void modifyReservation(Reservation reservation, double newCost) {
+        if (reservation == null) {
+            throw new IllegalArgumentException("Reservation cannot be null");
+        }
+        if (reservation.getStatus() == ReservationStatus.CANCELED) {
+            throw new IllegalStateException("Cannot modify a canceled reservation");
+        }
+
+        // Update cost
+        reservation.setTotalCost(newCost);
+
+        notifyObservers(reservation, "MODIFIED");
     }
 
     // Observer methods
