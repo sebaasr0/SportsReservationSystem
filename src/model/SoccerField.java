@@ -8,6 +8,7 @@ public class SoccerField implements Field {
 
     // Default constructor sets a default subtype
     public SoccerField() {
+
         this.subtype = FieldSubtype.SOCCER_5V5; // default
     }
 

@@ -8,6 +8,6 @@ import model.Reservation;
 
 public final class AdminDashboard implements Observer {
     public void update(Reservation r, String eventType) {
-        System.out.println("[DASH]  "+eventType+" -> "+r);
+        System.out.println("[ADMIN NOTIFICATION]  "+eventType+" -> "+r);
     }
 }

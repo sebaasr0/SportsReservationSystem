@@ -33,5 +33,7 @@ public final class User {
         if (!(o instanceof User u)) return false;
         return email.equals(u.email);
     }
-    @Override public int hashCode() { return Objects.hash(email); }
+    @Override public int hashCode() {
+        return Objects.hash(email);
+    }
 }

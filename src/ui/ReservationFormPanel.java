@@ -8,7 +8,6 @@ import Decorator.*;
 import factory.FieldFactory;
 import model.*;
 import Observer.AdminDashboard;
-import Observer.AuditLog;
 import Observer.EmailNotifier;
 import singleton.ReservationManager;
 
@@ -62,7 +61,6 @@ public class ReservationFormPanel extends JPanel {
         if (!observersInitialized) {
             m.addObserver(new EmailNotifier());
             m.addObserver(new AdminDashboard());
-            m.addObserver(new AuditLog());
             observersInitialized = true;
         }
 

@@ -17,9 +17,15 @@ public class TennisField implements Field {
         this.subtype = subtype;
     }
     
-    public String getType() { return "Tennis"; }
-    public double getBasePrice() { return subtype.getBasePrice(); }
-    public FieldSubtype getSubtype() { return subtype; }
+    public String getType() {
+        return "Tennis";
+    }
+    public double getBasePrice() {
+        return subtype.getBasePrice();
+    }
+    public FieldSubtype getSubtype() {
+        return subtype;
+    }
     
     public String getFullDescription() {
         return "Tennis Court - " + subtype.getDisplayName();

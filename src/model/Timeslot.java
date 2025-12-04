@@ -18,15 +18,23 @@ public final class Timeslot {
         this.date = date; this.start = start; this.end = end;
     }
     // Returns date of reservation
-    public LocalDate getDate() { return date; }
+    public LocalDate getDate() {
+        return date;
+    }
     // Returns start time
-    public LocalTime getStart() { return start; }
+    public LocalTime getStart() {
+        return start;
+    }
     // Returns end time
-    public LocalTime getEnd() { return end; }
+    public LocalTime getEnd() {
+        return end;
+    }
 
     public boolean overlaps(Timeslot other) {
         if (!date.equals(other.date)) return false;
         return start.isBefore(other.end) && other.start.isBefore(end);
     }
-    @Override public String toString() { return date + " " + start + "-" + end; }
+    @Override public String toString() {
+        return date + " " + start + "-" + end; }
+
 }

@@ -25,7 +25,7 @@ public final class ReserveCommand implements Command {
         Field field = FieldFactory.createField(sport);
         result = ReservationManager.getInstance()
                 .addReservation(user, field, slot, cost.getCost());
-        System.out.println("[CMD] Reserved -> " + result);
+        System.out.println("[COMMAND] Reserved -> " + result);
     }
 
     // Provides access to the result after execution

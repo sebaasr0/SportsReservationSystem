@@ -48,6 +48,7 @@ public final class ReservationManager implements Subject {
                 });
     }
 
+// Adds a new reservation if the timeslot is available
     public Reservation addReservation(User user, Field field, Timeslot slot, double cost) {
         if (!isAvailable(field, slot))
             throw new IllegalStateException("Timeslot not available for this field");
@@ -58,16 +59,17 @@ public final class ReservationManager implements Subject {
         return r;
     }
 
-    public void cancelReservation(Reservation r) {
-        r.cancel();
-        notifyObservers(r, "CANCELED");
+    public List<Reservation> listAll() {
+        return new ArrayList<>(reservations);
     }
 
-    public List<Reservation> listAll() { return new ArrayList<>(reservations); }
-
     // Observer methods
-    public void addObserver(Observer o) { observers.add(o); }
-    public void removeObserver(Observer o) { observers.remove(o); }
+    public void addObserver(Observer o) {
+        observers.add(o);
+    }
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
     public void notifyObservers(Reservation r, String eventType) {
         for (Observer o : observers) o.update(r, eventType);
     }

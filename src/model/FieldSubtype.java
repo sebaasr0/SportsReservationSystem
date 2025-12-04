@@ -27,9 +27,15 @@ public enum FieldSubtype {
         this.basePrice = basePrice;
     }
     
-    public String getDisplayName() { return displayName; }
-    public SportType getSportType() { return sportType; }
-    public double getBasePrice() { return basePrice; }
+    public String getDisplayName() {
+        return displayName;
+    }
+    public SportType getSportType() {
+        return sportType;
+    }
+    public double getBasePrice() {
+        return basePrice;
+    }
     
     public static FieldSubtype[] getSubtypesFor(SportType sport) {
         return switch (sport) {
