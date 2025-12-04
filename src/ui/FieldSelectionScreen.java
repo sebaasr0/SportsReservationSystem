@@ -27,16 +27,16 @@ public class FieldSelectionScreen extends JPanel {
 
         // Title
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(24, 24, 27));  // Charcoal background
+        titlePanel.setBackground(new Color(24, 24, 27));
         JLabel titleLabel = new JLabel("Select a Field Type");
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
-        titleLabel.setForeground(Color.WHITE);  // White text
+        titleLabel.setForeground(Color.WHITE);
         titlePanel.add(titleLabel);
         add(titlePanel, BorderLayout.NORTH);
 
         // Fields Panel
         JPanel fieldsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
-        fieldsPanel.setBackground(new Color(24, 24, 27));  // Charcoal background
+        fieldsPanel.setBackground(new Color(24, 24, 27));
 
         soccerPanel = createFieldPanel(SportType.SOCCER);
         tennisPanel = createFieldPanel(SportType.TENNIS);
@@ -50,7 +50,7 @@ public class FieldSelectionScreen extends JPanel {
 
         // Continue Button
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        bottomPanel.setBackground(new Color(24, 24, 27));  // Charcoal background
+        bottomPanel.setBackground(new Color(24, 24, 27));
 
         continueButton = new JButton("Continue");
         continueButton.setFont(new Font("SansSerif", Font.BOLD, 14));

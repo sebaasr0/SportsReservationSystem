@@ -16,7 +16,7 @@ public class FieldDrawingPanel extends JPanel {
     public FieldDrawingPanel(SportType sportType) {
         this.sportType = sportType;
         setPreferredSize(new Dimension(200, 160));
-        setBackground(new Color(39, 39, 42));  // Dark Gray panel
+        setBackground(new Color(39, 39, 42));
         setBorder(BorderFactory.createLineBorder(new Color(55, 55, 60), 1));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
