@@ -1,3 +1,5 @@
+//Yasir Pervaiz
+// A panel that draws different sports fields based on the selected sport type
 package ui;
 
 import model.SportType;
@@ -15,7 +17,7 @@ public class FieldDrawingPanel extends JPanel {
         this.sportType = sportType;
         setPreferredSize(new Dimension(200, 160));
         setBackground(new Color(81, 101, 170));
-        setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 3));
+        setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 1));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
     

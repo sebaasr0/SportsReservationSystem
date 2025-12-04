@@ -1,3 +1,5 @@
+//Jose Araya
+// This is a Concrete Command that encapsulates the action of creating a new reservation.
 package Command;
 
 import Decorator.ReservationCost;
@@ -13,13 +15,16 @@ public final class ReserveCommand implements Command {
     private Reservation result;
     // Constructor initializes all necessary reservation data
     public ReserveCommand(User user, SportType sport, Timeslot slot, ReservationCost cost) {
-        this.user = user; this.sport = sport; this.slot = slot; this.cost = cost;
+        this.user = user;
+        this.sport = sport;
+        this.slot = slot;
+        this.cost = cost;
     }
+    // Executes the reservation creation logic
     public void execute() {
         Field field = FieldFactory.createField(sport);
         result = ReservationManager.getInstance()
                 .addReservation(user, field, slot, cost.getCost());
-        // Logs the reservation creation
         System.out.println("[CMD] Reserved -> " + result);
     }
 

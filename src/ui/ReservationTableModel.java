@@ -1,3 +1,5 @@
+//Yasir Pervaiz
+//Table model for displaying reservation data in a JTable
 package ui;
 
 import model.Reservation;

@@ -1,5 +1,9 @@
+//Jose Araya
+// This is a Concrete Handler that checks for required fields.
+
 package chain;
 
+// Validates that name, email, and phone fields are not null or blank
 public final class RequiredFieldsHandler extends BaseContactHandler {
     public ValidationResult handle(ContactInput in) {
         if (in.name()==null || in.name().isBlank() ||

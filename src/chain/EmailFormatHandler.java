@@ -1,7 +1,11 @@
+//Jose Araya
+// This is a Concrete Handler that validates email format.
+
 package chain;
-// Handler in the Chain of Responsibility that validates email format
+
+// Validates that the email matches a standard email regex pattern
 public final class EmailFormatHandler extends BaseContactHandler {
-    private static final String RX="^[\\w._%+-]+@[\\w.-]+\\.[A-Za-z]{2,}$";
+    private static final String RX="^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"; // Standard email regex pattern
     public ValidationResult handle(ContactInput in) {
         // If email does not match the regex pattern, validation fails
         if (!in.email().matches(RX)) return ValidationResult.fail("Invalid email format.");

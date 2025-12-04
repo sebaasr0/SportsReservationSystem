@@ -1,3 +1,5 @@
+//Yasir Pervaiz
+// Screen for selecting a subtype of a sports field.
 package ui;
 
 import model.FieldSubtype;
@@ -40,7 +42,7 @@ public class SubtypeSelectionScreen extends JPanel {
         String sportName = sportType.name().charAt(0) + sportType.name().substring(1).toLowerCase();
         JLabel titleLabel = new JLabel("Select " + sportName + " Type", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
-        titleLabel.setForeground(Color.WHITE);  // FIXED: Added white text color
+        titleLabel.setForeground(Color.WHITE);
         topPanel.add(titleLabel, BorderLayout.CENTER);
 
         add(topPanel, BorderLayout.NORTH);

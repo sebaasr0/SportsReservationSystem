@@ -15,10 +15,10 @@ public final class User {
 
     public User(String name, String email, String phone) {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("Name required");
-        if (email == null || !email.matches("^[\\w._%+-]+@[\\w.-]+\\.[A-Za-z]{2,}$"))
+        if (email == null || !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))
             throw new IllegalArgumentException("Invalid email");
-        if (phone == null || !phone.matches("^\\+?[0-9\\- ]{7,15}$"))
-            throw new IllegalArgumentException("Invalid phone");
+        if (phone == null || !phone.matches("\\d{10}"))
+            throw new IllegalArgumentException("Phone number must be exactly 10 digits.");
         // Normalize data input
         this.name = name.trim();
         this.email = email.trim().toLowerCase();

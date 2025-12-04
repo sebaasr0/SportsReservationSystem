@@ -1,3 +1,5 @@
+//Yasir Pervaiz
+// Panel that visually represents a sports field subtypes.
 package ui;
 
 import model.FieldSubtype;
@@ -15,7 +17,7 @@ public class SubtypeDrawingPanel extends JPanel {
         this.subtype = subtype;
         setPreferredSize(new Dimension(220, 180));
         setBackground(new Color(81, 101, 170));
-        setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 3));
+        setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 1));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
     
