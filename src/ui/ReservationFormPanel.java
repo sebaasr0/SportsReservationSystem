@@ -51,7 +51,7 @@ public class ReservationFormPanel extends JPanel {
         this.onNewReservation = onNewReservation;
 
         setLayout(new BorderLayout(15, 15));
-        setBackground(new Color(20, 30, 70));
+        setBackground(new Color(68, 68, 81));
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         // Initialize date combo with next 14 days
@@ -113,14 +113,14 @@ public class ReservationFormPanel extends JPanel {
     //top panel
     private JPanel buildTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(20, 30, 70));
+        panel.setBackground(new Color(68, 68, 81));
 
         JButton backButton = new JButton("← Back");
         backButton.addActionListener(e -> onBack.run());
         panel.add(backButton, BorderLayout.WEST);
 
         JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(20, 30, 70));
+        titlePanel.setBackground(new Color(68, 68, 81));
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
 
         JLabel titleLabel = new JLabel("Complete Your Reservation");
@@ -151,7 +151,7 @@ public class ReservationFormPanel extends JPanel {
 
     private JPanel buildFormPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(new Color(10, 20, 58));
+        panel.setBackground(new Color(68, 68, 81));
 
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(8, 8, 8, 8);
@@ -159,7 +159,7 @@ public class ReservationFormPanel extends JPanel {
 
         // Date & Time Selection
         JPanel timePanel = new JPanel(new GridLayout(3, 2, 10, 5));
-        timePanel.setBackground(new Color(10, 20, 58));
+        timePanel.setBackground(new Color(68, 68, 81));
         timePanel.setBorder(createWhiteTitledBorder("Date & Time Selection"));
         timePanel.add(createWhiteLabel("Date:"));
         timePanel.add(dateCombo);
@@ -173,7 +173,7 @@ public class ReservationFormPanel extends JPanel {
 
         // Contact Info
         JPanel contactPanel = new JPanel(new GridLayout(3, 2, 10, 5));
-        contactPanel.setBackground(new Color(10, 20, 58));
+        contactPanel.setBackground(new Color(68, 68, 81));
         contactPanel.setBorder(createWhiteTitledBorder("Contact Information"));
         contactPanel.add(createWhiteLabel("Full Name:"));
         contactPanel.add(nameField);
@@ -187,16 +187,16 @@ public class ReservationFormPanel extends JPanel {
 
         // Add-ons
         JPanel addonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
-        addonsPanel.setBackground(new Color(10, 20, 58));
+        addonsPanel.setBackground(new Color(68, 68, 81));
         addonsPanel.setBorder(createWhiteTitledBorder("Add-ons (Optional)"));
 
         // Style checkboxes with white text
         chkLighting.setForeground(Color.WHITE);
-        chkLighting.setBackground(new Color(10, 20, 58));
+        chkLighting.setBackground(new Color(68, 68, 81));
         chkEquip.setForeground(Color.WHITE);
-        chkEquip.setBackground(new Color(10, 20, 58));
+        chkEquip.setBackground(new Color(68, 68, 81));
         chkRefresh.setForeground(Color.WHITE);
-        chkRefresh.setBackground(new Color(10, 20, 58));
+        chkRefresh.setBackground(new Color(68, 68, 81));
 
         addonsPanel.add(chkLighting);
         addonsPanel.add(chkEquip);
@@ -221,7 +221,7 @@ public class ReservationFormPanel extends JPanel {
 
     private JPanel buildBottomPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panel.setBackground(new Color(20, 30, 70));
+        panel.setBackground(new Color(68, 68, 81));
 
         JButton viewButton = new JButton("View Reservations");
         viewButton.addActionListener(e -> showReservationsDialog());

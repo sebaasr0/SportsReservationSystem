@@ -28,12 +28,12 @@ public class SubtypeSelectionScreen extends JPanel {
         this.onBack = onBack;
 
         setLayout(new BorderLayout(20, 20));
-        setBackground(new Color(20, 30, 70));
+        setBackground(new Color(68, 68, 81));
         setBorder(new EmptyBorder(30, 30, 30, 30));
 
         // Top Panel
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(new Color(20, 30, 70));
+        topPanel.setBackground(new Color(68, 68, 81));
 
         JButton backButton = new JButton("← Back");
         backButton.addActionListener(e -> onBack.run());
@@ -49,7 +49,7 @@ public class SubtypeSelectionScreen extends JPanel {
 
         // Subtypes Panel
         JPanel subtypesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 20));
-        subtypesPanel.setBackground(new Color(20, 30, 70));
+        subtypesPanel.setBackground(new Color(68, 68, 81));
 
         FieldSubtype[] subtypes = FieldSubtype.getSubtypesFor(sportType);
         for (FieldSubtype subtype : subtypes) {
@@ -62,7 +62,7 @@ public class SubtypeSelectionScreen extends JPanel {
 
         // Continue Button
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        bottomPanel.setBackground(new Color(20, 30, 70));
+        bottomPanel.setBackground(new Color(68, 68, 81));
 
         continueButton = new JButton("Continue");
         continueButton.setFont(new Font("SansSerif", Font.BOLD, 14));

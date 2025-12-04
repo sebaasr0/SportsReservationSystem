@@ -16,7 +16,7 @@ public class FieldDrawingPanel extends JPanel {
     public FieldDrawingPanel(SportType sportType) {
         this.sportType = sportType;
         setPreferredSize(new Dimension(200, 160));
-        setBackground(new Color(81, 101, 170));
+        setBackground(new Color(106, 106, 147));
         setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0), 1));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
@@ -148,7 +148,7 @@ public class FieldDrawingPanel extends JPanel {
         g2d.drawLine(x + w/2, y + h - serviceH, x + w/2, y + h);
         
         // Walls (darker borders)
-        g2d.setColor(new Color(70, 70, 100));
+        g2d.setColor(new Color(68, 68, 81));
         g2d.setStroke(new BasicStroke(4));
         g2d.drawLine(x, y, x, y + h);
         g2d.drawLine(x + w, y, x + w, y + h);

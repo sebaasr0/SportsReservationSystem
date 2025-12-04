@@ -36,7 +36,7 @@ public class MainFrame extends JFrame {
         
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
-        mainPanel.setBackground(new Color(20, 30, 70));
+        mainPanel.setBackground(new Color(68, 68, 81));
         
         // Initialize the first screen
         initFieldSelectionScreen();
