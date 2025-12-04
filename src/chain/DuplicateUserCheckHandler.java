@@ -12,7 +12,7 @@ public final class DuplicateUserCheckHandler extends BaseContactHandler {
     public ValidationResult handle(ContactInput in) {
         if (manager.userExists(in.email()))
             // If email already exists, return warning message
-            return ValidationResult.fail("Email already exists. Continue or use another email.");
+            return ValidationResult.fail("Email already exists. Just one reservation per user is allowed.");
 
         // If valid, forward the input to the next handler in the chain
 
