@@ -32,14 +32,17 @@ public class ReservationFormPanel extends JPanel {
 
     // Date selection - next 14 days
     private final JComboBox<String> dateCombo = new JComboBox<>();
-    private final JComboBox<String> hourCombo = new JComboBox<>(new String[]{"8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+    // Hour selection with AM/PM format (8:00 AM to 8:00 PM)
+    private final JComboBox<String> hourCombo = new JComboBox<>(new String[]{
+            "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
             "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
-            "6:00 PM", "7:00 PM", "8:00 PM"});
-    private final JComboBox<Integer> durCombo = new JComboBox<>(new Integer[]{1,2});
+            "6:00 PM", "7:00 PM", "8:00 PM"
+    });
+    private final JComboBox<Integer> durCombo = new JComboBox<>(new Integer[]{1, 2});
 
-    private final JCheckBox chkLighting = new JCheckBox("Lighting (+$10)");
-    private final JCheckBox chkEquip = new JCheckBox("Equipment (+$8)");
-    private final JCheckBox chkRefresh = new JCheckBox("Refreshments (+$5)");
+    private final JCheckBox chkLighting = new JCheckBox("Lighting (+$10/hr)");
+    private final JCheckBox chkEquip = new JCheckBox("Equipment (+$8/hr)");
+    private final JCheckBox chkRefresh = new JCheckBox("Refreshments (+$5/hr)");
 
     private final JTable table;
     private final ReservationTableModel tableModel;
@@ -93,6 +96,30 @@ public class ReservationFormPanel extends JPanel {
     private LocalDate getSelectedDate() {
         int selectedIndex = dateCombo.getSelectedIndex();
         return LocalDate.now().plusDays(selectedIndex);
+    }
+
+    //Converts AM/PM time string to 24-hour format integer
+    private int getSelectedHour() {
+        String selected = (String) hourCombo.getSelectedItem();
+        // Parse "8:00 AM" or "1:00 PM" format
+        String[] parts = selected.split(":");
+        int hour = Integer.parseInt(parts[0]);
+        boolean isPM = selected.contains("PM");
+
+        if (isPM && hour != 12) {
+            hour += 12; // Convert PM hours
+        } else if (!isPM && hour == 12) {
+            hour = 0;  // Convert 12 AM to 0 hour
+        }
+        return hour;
+    }
+
+    // Helper method to format hour to AM/PM for display
+    private String formatHour(int hour) {
+        if (hour == 0 || hour == 24) return "12:00 AM";
+        if (hour == 12) return "12:00 PM";
+        if (hour < 12) return hour + ":00 AM";
+        return (hour - 12) + ":00 PM";
     }
 
     // Helper method to create white label
@@ -190,7 +217,7 @@ public class ReservationFormPanel extends JPanel {
         // Add-ons
         JPanel addonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
         addonsPanel.setBackground(new Color(68, 68, 81));
-        addonsPanel.setBorder(createWhiteTitledBorder("Add-ons (Optional)"));
+        addonsPanel.setBorder(createWhiteTitledBorder("Add-ons (Optional - per hour)"));
 
         // Style checkboxes with white text
         chkLighting.setForeground(Color.WHITE);
@@ -231,9 +258,9 @@ public class ReservationFormPanel extends JPanel {
 
         return panel;
     }
+
     // Shows the reservations dialog with options to cancel or modify
     private void showReservationsDialog() {
-
         ReservationTableModel dialogTableModel = new ReservationTableModel(ReservationManager.getInstance().listAll());
         JTable dialogTable = new JTable(dialogTableModel);
 
@@ -241,6 +268,7 @@ public class ReservationFormPanel extends JPanel {
         dialogTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         dialogTable.setRowSelectionAllowed(true);
         dialogTable.setFocusable(true);
+
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "All Reservations", true);
         dialog.setSize(900, 400);
         dialog.setLocationRelativeTo(this);
@@ -284,7 +312,7 @@ public class ReservationFormPanel extends JPanel {
                     "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // Get the selected reservation
+
         Reservation reservation = dialogTableModel.getReservationAt(selectedRow);
         if (reservation == null) {
             JOptionPane.showMessageDialog(parentDialog,
@@ -292,20 +320,21 @@ public class ReservationFormPanel extends JPanel {
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // Check if already canceled
-        if (reservation.getStatus() == model.ReservationStatus.CANCELED) {
+
+        if (reservation.getStatus() == ReservationStatus.CANCELED) {
             JOptionPane.showMessageDialog(parentDialog,
                     "This reservation is already canceled.",
                     "Already Canceled", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // Confirm cancellation
+
         int confirm = JOptionPane.showConfirmDialog(parentDialog,
                 "Are you sure you want to cancel this reservation?\n\n" +
                         "User: " + reservation.getUser().getName() + "\n" +
                         "Field: " + reservation.getField().getFullDescription() + "\n" +
                         "Date: " + reservation.getTimeslot().getDate() + "\n" +
-                        "Time: " + reservation.getTimeslot().getStart() + " - " + reservation.getTimeslot().getEnd(),
+                        "Time: " + formatHour(reservation.getTimeslot().getStart().getHour()) +
+                        " - " + formatHour(reservation.getTimeslot().getEnd().getHour()),
                 "Confirm Cancellation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
         if (confirm == JOptionPane.YES_OPTION) {
@@ -313,7 +342,7 @@ public class ReservationFormPanel extends JPanel {
                 CancelCommand cmd = new CancelCommand(reservation);
                 invoker.setCommand(cmd);
                 invoker.execute();
-                // Refresh table data
+
                 dialogTableModel.setData(ReservationManager.getInstance().listAll());
                 JOptionPane.showMessageDialog(parentDialog,
                         "Reservation canceled successfully!",
@@ -335,7 +364,7 @@ public class ReservationFormPanel extends JPanel {
                     "No Selection", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // Get the selected reservation
+
         Reservation reservation = dialogTableModel.getReservationAt(selectedRow);
         if (reservation == null) {
             JOptionPane.showMessageDialog(parentDialog,
@@ -343,69 +372,77 @@ public class ReservationFormPanel extends JPanel {
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // Check if canceled
-        if (reservation.getStatus() == model.ReservationStatus.CANCELED) {
+
+        if (reservation.getStatus() == ReservationStatus.CANCELED) {
             JOptionPane.showMessageDialog(parentDialog,
                     "Cannot modify a canceled reservation.",
                     "Cannot Modify", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Show modification dialog
         showModifyDialog(parentDialog, reservation, dialogTableModel);
     }
 
     // Shows a dialog to modify the reservation cost (add-ons)
     private void showModifyDialog(JDialog parentDialog, Reservation reservation, ReservationTableModel dialogTableModel) {
         JDialog modifyDialog = new JDialog(parentDialog, "Modify Reservation", true);
-        modifyDialog.setSize(450, 350);
+        modifyDialog.setSize(450, 400);
         modifyDialog.setLocationRelativeTo(parentDialog);
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        // Calculate base price and determine which add-ons are currently selected
+        //Get base price from the ACTUAL field subtype stored in reservation
         double basePrice = reservation.getField().getBasePrice();
         double currentCost = reservation.getTotalCost();
-        double addOnsCost = currentCost - basePrice;
 
-        // Determine which add-ons are likely selected based on cost
+        // Calculate duration from timeslot
+        int duration = reservation.getTimeslot().getEnd().getHour() - reservation.getTimeslot().getStart().getHour();
+        if (duration <= 0) duration = 1;
+
+        // Calculate HOURLY cost first, then determine add-ons
+        double hourlyCost = currentCost / duration;
+        double hourlyAddOns = hourlyCost - basePrice;
+
+        // Determine which add-ons are selected based on HOURLY add-on cost
         boolean hasLighting = false;
         boolean hasEquipment = false;
         boolean hasRefreshments = false;
 
-        // Check combinations to determine add-ons (greedy approach from highest to lowest)
-        double remaining = addOnsCost;
-        if (remaining >= 10.0) {
+        // Check combinations (with small tolerance for floating point)
+        double remaining = hourlyAddOns;
+        if (remaining >= 9.99) {
             hasLighting = true;
             remaining -= 10.0;
         }
-        if (remaining >= 8.0) {
+        if (remaining >= 7.99) {
             hasEquipment = true;
             remaining -= 8.0;
         }
-        if (remaining >= 5.0) {
+        if (remaining >= 4.99) {
             hasRefreshments = true;
-            remaining -= 5.0;
         }
 
         // Info panel
-        JPanel infoPanel = new JPanel(new GridLayout(5, 1, 5, 5));
+        JPanel infoPanel = new JPanel(new GridLayout(7, 1, 5, 5));
         infoPanel.setBorder(BorderFactory.createTitledBorder("Current Reservation"));
         infoPanel.add(new JLabel("User: " + reservation.getUser().getName()));
         infoPanel.add(new JLabel("Field: " + reservation.getField().getFullDescription()));
         infoPanel.add(new JLabel("Date: " + reservation.getTimeslot().getDate()));
-        infoPanel.add(new JLabel("Base Price: $" + String.format("%.2f", basePrice)));
+        infoPanel.add(new JLabel("Time: " + formatHour(reservation.getTimeslot().getStart().getHour()) +
+                " - " + formatHour(reservation.getTimeslot().getEnd().getHour())));
+        infoPanel.add(new JLabel("Duration: " + duration + " hour(s)"));
+        infoPanel.add(new JLabel("Base Price: $" + String.format("%.2f", basePrice) + "/hr"));
         infoPanel.add(new JLabel("Current Total: $" + String.format("%.2f", currentCost)));
         panel.add(infoPanel, BorderLayout.NORTH);
 
         // Add-ons modification panel
         JPanel addonsPanel = new JPanel(new GridLayout(4, 1, 5, 5));
-        addonsPanel.setBorder(BorderFactory.createTitledBorder("Modify Add-ons (check/uncheck to add/remove)"));
+        addonsPanel.setBorder(BorderFactory.createTitledBorder("Modify Add-ons (per hour)"));
 
-        JCheckBox modLighting = new JCheckBox("Lighting ($10)");
-        JCheckBox modEquip = new JCheckBox("Equipment ($8)");
-        JCheckBox modRefresh = new JCheckBox("Refreshments ($5)");
+        JCheckBox modLighting = new JCheckBox("Lighting ($10/hr)");
+        JCheckBox modEquip = new JCheckBox("Equipment ($8/hr)");
+        JCheckBox modRefresh = new JCheckBox("Refreshments ($5/hr)");
 
         // Pre-select checkboxes based on current add-ons
         modLighting.setSelected(hasLighting);
@@ -421,30 +458,37 @@ public class ReservationFormPanel extends JPanel {
         // Buttons panel
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
+        final int finalDuration = duration;
         JButton applyBtn = new JButton("Apply Changes");
         applyBtn.addActionListener(e -> {
-            // Calculate new total based on selected add-ons
-            double newCost = basePrice;
-            if (modLighting.isSelected()) newCost += 10.0;
-            if (modEquip.isSelected()) newCost += 8.0;
-            if (modRefresh.isSelected()) newCost += 5.0;
+            // Calculate new hourly cost based on selected add-ons
+            double newHourlyCost = basePrice;
+            if (modLighting.isSelected()) newHourlyCost += 10.0;
+            if (modEquip.isSelected()) newHourlyCost += 8.0;
+            if (modRefresh.isSelected()) newHourlyCost += 5.0;
+
+            // Multiply by duration for total cost
+            double newTotalCost = newHourlyCost * finalDuration;
 
             // Check if anything changed
-            if (Math.abs(newCost - currentCost) < 0.01) {
+            if (Math.abs(newTotalCost - currentCost) < 0.01) {
                 JOptionPane.showMessageDialog(modifyDialog,
                         "No changes were made to the add-ons.",
                         "No Changes", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            // Execute modification command
+
             try {
-                ModifyCommand cmd = new ModifyCommand(reservation, newCost);
+                ModifyCommand cmd = new ModifyCommand(reservation, newTotalCost);
                 invoker.setCommand(cmd);
                 invoker.execute();
 
                 dialogTableModel.setData(ReservationManager.getInstance().listAll());
                 JOptionPane.showMessageDialog(modifyDialog,
-                        "Reservation modified successfully!\nNew total: $" + String.format("%.2f", newCost),
+                        "Reservation modified successfully!\n" +
+                                "Hourly rate: $" + String.format("%.2f", newHourlyCost) + "\n" +
+                                "Duration: " + finalDuration + " hour(s)\n" +
+                                "New total: $" + String.format("%.2f", newTotalCost),
                         "Success", JOptionPane.INFORMATION_MESSAGE);
                 modifyDialog.dispose();
             } catch (Exception ex) {
@@ -475,7 +519,6 @@ public class ReservationFormPanel extends JPanel {
                     .setNext(new PhoneFormatHandler())
                     .setNext(new DuplicateUserCheckHandler());
 
-            // Validate input through the chain
             ValidationResult vr = chain.handle(input);
             if (!vr.isOk()) {
                 JOptionPane.showMessageDialog(this, vr.getMessage(), "Validation", JOptionPane.WARNING_MESSAGE);
@@ -484,30 +527,57 @@ public class ReservationFormPanel extends JPanel {
 
             // Build field and cost with decorators
             Field field = FieldFactory.createField(selectedSubtype);
-            ReservationCost cost = new BaseReservationCost(field);
-            if (chkLighting.isSelected()) cost = new LightingDecorator(cost);
-            if (chkEquip.isSelected()) cost = new EquipmentDecorator(cost);
-            if (chkRefresh.isSelected()) cost = new RefreshmentDecorator(cost);
 
-            // Create timeslot
+            // Get duration
+            int duration = (Integer) durCombo.getSelectedItem();
+
+            // Calculate hourly cost first, then multiply by duration
+            ReservationCost hourlyCost = new BaseReservationCost(field);
+            if (chkLighting.isSelected()) hourlyCost = new LightingDecorator(hourlyCost);
+            if (chkEquip.isSelected()) hourlyCost = new EquipmentDecorator(hourlyCost);
+            if (chkRefresh.isSelected()) hourlyCost = new RefreshmentDecorator(hourlyCost);
+
+            // Get hourly rate and calculate total
+            final double hourlyRate = hourlyCost.getCost();
+            final double totalCost = hourlyRate * duration;
+            final String description = hourlyCost.getDescription();
+
+            // Create a cost object with the total (for the command)
+            ReservationCost finalCost = new ReservationCost() {
+                @Override
+                public double getCost() {
+                    return totalCost;
+                }
+                @Override
+                public String getDescription() {
+                    return description + " x " + duration + " hour(s)";
+                }
+            };
+
+            // Create timeslot - Parse AM/PM time correctly
             LocalDate selectedDate = getSelectedDate();
-            int startHour = (Integer) hourCombo.getSelectedItem();
-            int dur = (Integer) durCombo.getSelectedItem();
-            Timeslot slot = new Timeslot(selectedDate, LocalTime.of(startHour, 0), LocalTime.of(startHour + dur, 0));
+            int startHour = getSelectedHour();
+            Timeslot slot = new Timeslot(selectedDate, LocalTime.of(startHour, 0), LocalTime.of(startHour + duration, 0));
 
             // Create user and execute reservation command
             User user = new User(input.name(), input.email(), input.phone());
-            ReserveCommand cmd = new ReserveCommand(user, selectedSubtype.getSportType(), slot, cost);
+            ReserveCommand cmd = new ReserveCommand(user, selectedSubtype, slot, finalCost);
             invoker.setCommand(cmd);
             invoker.execute();
 
-            // Show success message
+            // Format times for display
+            String startTimeDisplay = formatHour(startHour);
+            String endTimeDisplay = formatHour(startHour + duration);
+
+            // Show success message with detailed breakdown
             JOptionPane.showMessageDialog(this,
                     "Reservation created!\n\n" +
                             "Field: " + field.getFullDescription() + "\n" +
                             "Date: " + selectedDate + "\n" +
-                            "Time: " + slot.getStart() + " - " + slot.getEnd() + "\n" +
-                            "Total: $" + String.format("%.2f", cost.getCost()),
+                            "Time: " + startTimeDisplay + " - " + endTimeDisplay + "\n" +
+                            "Duration: " + duration + " hour(s)\n" +
+                            "Hourly Rate: $" + String.format("%.2f", hourlyRate) + "\n" +
+                            "Total: $" + String.format("%.2f", totalCost),
                     "Success", JOptionPane.INFORMATION_MESSAGE);
 
             nameField.setText("");
