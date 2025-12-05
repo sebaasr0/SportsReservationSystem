@@ -80,7 +80,6 @@ Notifies components when reservation events occur.
 **Observers:**
 - `EmailNotifier`
 - `AdminDashboard`
-- `AuditLog`
 
 How it works:
 1. Observers register with `ReservationManager`
@@ -126,15 +125,7 @@ Adds optional add-ons to reservations dynamically.
 **Core:**
 - `ReservationCost`
 - `BaseReservationCost`
-- `AddOnDecorator`
 
-Example:
-```java
-ReservationCost cost = new BaseReservationCost(field);
-cost = new LightingDecorator(cost);
-cost = new EquipmentDecorator(cost);
-cost = new RefreshmentDecorator(cost);
-```
 
 Why:
 - Stack features in any order
@@ -157,16 +148,6 @@ Validates contact and reservation data through independent rules.
 - `ContactHandler`
 - `ValidationResult`
 
-Setup:
-```java
-ContactHandler chain = new RequiredFieldsHandler();
-chain.setNext(new EmailFormatHandler())
-     .setNext(new PhoneFormatHandler())
-     .setNext(new DuplicateUserCheckHandler());
-
-ValidationResult result = chain.handle(input);
-```
-
 Why:
 - One responsibility per handler
 - Stops at first failure
@@ -179,8 +160,7 @@ Why:
 ✔ Java Swing GUI  
 ✔ Real-time validation  
 ✔ Reservation processing pipeline  
-✔ Email simulation  
-✔ Audit logs  
+✔ Email simulation
 ✔ Admin dashboard  
 ✔ Add-on pricing logic  
 ✔ Clean architecture  
@@ -207,8 +187,7 @@ src/App/Main.java
 
 ```
 [EMAIL] Event=CREATED To=a@gmail.com -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
-[DASH]  CREATED -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
-[AUDIT] CREATED -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
+[ADMIN NOTIFICATION]  CREATED -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
 [CMD] Reserved -> v | Tennis | 2025-12-03 08:00-09:00 | $38.00 | CONFIRMED
 ```
 
@@ -223,6 +202,7 @@ SportsReservationSystem/
 │   └── Main.java
 │
 ├── chain/
+│   ├──ContactInput
 │   ├── BaseContactHandler
 │   ├── ContactHandler
 │   ├── RequiredFieldsHandler
@@ -235,12 +215,13 @@ SportsReservationSystem/
 │   ├── Command
 │   ├── CommandInvoker
 │   ├── ReserveCommand
-│   └── (Other commands)
+│   └── CancelCommand
+│   └── ModifyCommand
+│   
 │
 ├── Decorator/
 │   ├── ReservationCost
 │   ├── BaseReservationCost
-│   ├── AddOnDecorator
 │   ├── LightingDecorator
 │   ├── EquipmentDecorator
 │   └── RefreshmentDecorator
@@ -259,13 +240,13 @@ SportsReservationSystem/
 │   ├── Timeslot
 │   ├── Reservation
 │   └── ReservationStatus
+│   └── AddOnType
 │
 ├── Observer/
 │   ├── Observer
 │   ├── Subject
 │   ├── EmailNotifier
 │   ├── AdminDashboard
-│   └── AuditLog
 │
 ├── singleton/
 │   └── ReservationManager
@@ -278,6 +259,7 @@ SportsReservationSystem/
     ├── ReservationTableModel
     ├── FieldDrawingPanel
     └── SubtypeDrawingPanel
+   
 ```
 
 ---
@@ -294,15 +276,18 @@ SportsReservationSystem/
 ## Sources Used
 
 - Course lecture slides and class materials (CIS3303 – Object-Oriented Design)
-- Github copilot \
-
+- Github Copilot with Intellij
+- https://zetcode.com/javaswing/painting/
+- https://stackoverflow.com/questions
+- https://docs.oracle.com/javase/tutorial/uiswing/
+- https://github.com/OOD-NCF
 ---
 
-## Author
+## Authors
 
-**Jose Araya-Sancho**  
+**Jose Araya Sancho**  
 **Sebastian Rodriguez**  
-**Yasir Dar**
+**Yasir Pervaiz Dar**
 
 New College of Florida  
 CIS3303 – Object-Oriented Design
