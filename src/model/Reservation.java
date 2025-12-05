@@ -55,10 +55,6 @@ public final class Reservation {
         return Collections.unmodifiableSet(addOns);
     }
 
-    public boolean hasAddOn(AddOnType type) {
-        return addOns.contains(type);
-    }
-
     public void setTotalCost(double totalCost) {
         this.totalCost = totalCost;
     }

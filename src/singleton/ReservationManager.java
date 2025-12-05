@@ -23,11 +23,6 @@ public final class ReservationManager implements Subject {
         return instance;
     }
 
-    // User management
-    public boolean userExists(String email) {
-        return email != null && usersByEmail.containsKey(email.toLowerCase());
-    }
-
     // Checks if a user has any ACTIVE (CONFIRMED) reservations
     // Returns false if all their reservations are canceled
     public boolean userHasActiveReservation(String email) {
@@ -56,11 +51,6 @@ public final class ReservationManager implements Subject {
                     }
                     return sameType && sameSubtype && r.getTimeslot().overlaps(slot);
                 });
-    }
-
-    // Original method for backward compatibility
-    public Reservation addReservation(User user, Field field, Timeslot slot, double cost) {
-        return addReservation(user, field, slot, cost, new HashSet<>());
     }
 
     // New method that properly stores add-ons

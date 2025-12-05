@@ -40,6 +40,4 @@ public final class ReserveCommand implements Command {
         System.out.println("[COMMAND] Reserved -> " + result);
     }
 
-    // Provides access to the result after execution
-    public Reservation getResult() { return result; }
 }
